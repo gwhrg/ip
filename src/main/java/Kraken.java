@@ -1,11 +1,11 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Kraken {
     private static final String LINE = "____________________________________________________________";
 
     public static void main(String[] args) {
-        Task[] tasks = new Task[100];
-        int taskCount = 0;
+        ArrayList<Task> tasks = new ArrayList<>();
 
         try (Scanner in = new Scanner(System.in)) {
             System.out.println(LINE);
@@ -25,23 +25,25 @@ public class Kraken {
                     } else if (trimmedInput.equals("list")) {
                         System.out.println(LINE);
                         System.out.println(" Here are the tasks in your list:");
-                        for (int i = 0; i < taskCount; i++) {
-                            System.out.println(" " + (i + 1) + "." + tasks[i]);
+                        for (int i = 0; i < tasks.size(); i++) {
+                            System.out.println(" " + (i + 1) + "." + tasks.get(i));
                         }
                         System.out.println(LINE);
                     } else if (trimmedInput.equals("mark") || trimmedInput.startsWith("mark ")) {
-                        taskCount = handleMark(trimmedInput, tasks, taskCount);
+                        handleMark(trimmedInput, tasks);
                     } else if (trimmedInput.equals("unmark") || trimmedInput.startsWith("unmark ")) {
-                        taskCount = handleUnmark(trimmedInput, tasks, taskCount);
+                        handleUnmark(trimmedInput, tasks);
                     } else if (trimmedInput.equals("todo") || trimmedInput.startsWith("todo ")) {
-                        taskCount = handleTodo(trimmedInput, tasks, taskCount);
+                        handleTodo(trimmedInput, tasks);
                     } else if (trimmedInput.equals("deadline") || trimmedInput.startsWith("deadline ")) {
-                        taskCount = handleDeadline(trimmedInput, tasks, taskCount);
+                        handleDeadline(trimmedInput, tasks);
                     } else if (trimmedInput.equals("event") || trimmedInput.startsWith("event ")) {
-                        taskCount = handleEvent(trimmedInput, tasks, taskCount);
+                        handleEvent(trimmedInput, tasks);
+                    } else if (trimmedInput.equals("delete") || trimmedInput.startsWith("delete ")) {
+                        handleDelete(trimmedInput, tasks);
                     } else {
                         throw new KrakenException("I don't understand that command. "
-                                + "Try: todo, deadline, event, list, mark, unmark, bye");
+                                + "Try: todo, deadline, event, list, mark, unmark, delete, bye");
                     }
                 } catch (KrakenException e) {
                     System.out.println(LINE);
@@ -52,7 +54,7 @@ public class Kraken {
         }
     }
 
-    private static int handleTodo(String input, Task[] tasks, int taskCount) throws KrakenException {
+    private static void handleTodo(String input, ArrayList<Task> tasks) throws KrakenException {
         String description;
         if (input.equals("todo")) {
             description = "";
@@ -65,13 +67,12 @@ public class Kraken {
                     + "Usage: todo <description>");
         }
 
-        tasks[taskCount] = new Todo(description);
-        taskCount++;
-        printAddedTask(tasks[taskCount - 1], taskCount);
-        return taskCount;
+        Task newTask = new Todo(description);
+        tasks.add(newTask);
+        printAddedTask(newTask, tasks.size());
     }
 
-    private static int handleDeadline(String input, Task[] tasks, int taskCount) throws KrakenException {
+    private static void handleDeadline(String input, ArrayList<Task> tasks) throws KrakenException {
         String remainder;
         if (input.equals("deadline")) {
             remainder = "";
@@ -105,13 +106,12 @@ public class Kraken {
                     + "Usage: deadline <description> /by <date>");
         }
 
-        tasks[taskCount] = new Deadline(description, by);
-        taskCount++;
-        printAddedTask(tasks[taskCount - 1], taskCount);
-        return taskCount;
+        Task newTask = new Deadline(description, by);
+        tasks.add(newTask);
+        printAddedTask(newTask, tasks.size());
     }
 
-    private static int handleEvent(String input, Task[] tasks, int taskCount) throws KrakenException {
+    private static void handleEvent(String input, ArrayList<Task> tasks) throws KrakenException {
         String remainder;
         if (input.equals("event")) {
             remainder = "";
@@ -163,13 +163,12 @@ public class Kraken {
                     + "Usage: event <description> /from <start> /to <end>");
         }
 
-        tasks[taskCount] = new Event(description, from, to);
-        taskCount++;
-        printAddedTask(tasks[taskCount - 1], taskCount);
-        return taskCount;
+        Task newTask = new Event(description, from, to);
+        tasks.add(newTask);
+        printAddedTask(newTask, tasks.size());
     }
 
-    private static int handleMark(String input, Task[] tasks, int taskCount) throws KrakenException {
+    private static void handleMark(String input, ArrayList<Task> tasks) throws KrakenException {
         String indexStr;
         if (input.equals("mark")) {
             indexStr = "";
@@ -190,20 +189,19 @@ public class Kraken {
                     + "Usage: mark <task number>");
         }
 
-        if (taskIndex < 0 || taskIndex >= taskCount) {
+        if (taskIndex < 0 || taskIndex >= tasks.size()) {
             throw new KrakenException("Task number " + (taskIndex + 1) + " does not exist. "
-                    + "You have " + taskCount + " task(s) in your list.");
+                    + "You have " + tasks.size() + " task(s) in your list.");
         }
 
-        tasks[taskIndex].markAsDone();
+        tasks.get(taskIndex).markAsDone();
         System.out.println(LINE);
         System.out.println(" Nice! I've marked this task as done:");
-        System.out.println("   " + tasks[taskIndex]);
+        System.out.println("   " + tasks.get(taskIndex));
         System.out.println(LINE);
-        return taskCount;
     }
 
-    private static int handleUnmark(String input, Task[] tasks, int taskCount) throws KrakenException {
+    private static void handleUnmark(String input, ArrayList<Task> tasks) throws KrakenException {
         String indexStr;
         if (input.equals("unmark")) {
             indexStr = "";
@@ -224,17 +222,50 @@ public class Kraken {
                     + "Usage: unmark <task number>");
         }
 
-        if (taskIndex < 0 || taskIndex >= taskCount) {
+        if (taskIndex < 0 || taskIndex >= tasks.size()) {
             throw new KrakenException("Task number " + (taskIndex + 1) + " does not exist. "
-                    + "You have " + taskCount + " task(s) in your list.");
+                    + "You have " + tasks.size() + " task(s) in your list.");
         }
 
-        tasks[taskIndex].markAsNotDone();
+        tasks.get(taskIndex).markAsNotDone();
         System.out.println(LINE);
         System.out.println(" OK, I've marked this task as not done yet:");
-        System.out.println("   " + tasks[taskIndex]);
+        System.out.println("   " + tasks.get(taskIndex));
         System.out.println(LINE);
-        return taskCount;
+    }
+
+    private static void handleDelete(String input, ArrayList<Task> tasks) throws KrakenException {
+        String indexStr;
+        if (input.equals("delete")) {
+            indexStr = "";
+        } else {
+            indexStr = input.substring("delete ".length()).trim();
+        }
+
+        if (indexStr.isEmpty()) {
+            throw new KrakenException("Please specify which task to delete. "
+                    + "Usage: delete <task number>");
+        }
+
+        int taskIndex;
+        try {
+            taskIndex = Integer.parseInt(indexStr) - 1;
+        } catch (NumberFormatException e) {
+            throw new KrakenException("'" + indexStr + "' is not a valid task number. "
+                    + "Usage: delete <task number>");
+        }
+
+        if (taskIndex < 0 || taskIndex >= tasks.size()) {
+            throw new KrakenException("Task number " + (taskIndex + 1) + " does not exist. "
+                    + "You have " + tasks.size() + " task(s) in your list.");
+        }
+
+        Task removedTask = tasks.remove(taskIndex);
+        System.out.println(LINE);
+        System.out.println(" Noted. I've removed this task:");
+        System.out.println("   " + removedTask);
+        System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+        System.out.println(LINE);
     }
 
     private static void printAddedTask(Task task, int taskCount) {
