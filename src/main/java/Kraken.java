@@ -2,7 +2,7 @@ import java.util.Scanner;
 
 public class Kraken {
     public static void main(String[] args) {
-        String[] tasks = new String[100];
+        Task[] tasks = new Task[100];
         int taskCount = 0;
 
         try (Scanner in = new Scanner(System.in)) {
@@ -22,12 +22,27 @@ public class Kraken {
                     return;
                 } else if (trimmedInput.equals("list")) {
                     System.out.println("____________________________________________________________");
+                    System.out.println(" Here are the tasks in your list:");
                     for (int i = 0; i < taskCount; i++) {
-                        System.out.println(" " + (i + 1) + ". " + tasks[i]);
+                        System.out.println(" " + (i + 1) + ".[" + tasks[i].getStatusIcon() + "] " + tasks[i].description);
                     }
                     System.out.println("____________________________________________________________");
+                } else if (trimmedInput.startsWith("mark ")) {
+                    int taskIndex = Integer.parseInt(trimmedInput.substring(5).trim()) - 1;
+                    tasks[taskIndex].markAsDone();
+                    System.out.println("____________________________________________________________");
+                    System.out.println(" Nice! I've marked this task as done:");
+                    System.out.println("   [" + tasks[taskIndex].getStatusIcon() + "] " + tasks[taskIndex].description);
+                    System.out.println("____________________________________________________________");
+                } else if (trimmedInput.startsWith("unmark ")) {
+                    int taskIndex = Integer.parseInt(trimmedInput.substring(7).trim()) - 1;
+                    tasks[taskIndex].markAsNotDone();
+                    System.out.println("____________________________________________________________");
+                    System.out.println(" OK, I've marked this task as not done yet:");
+                    System.out.println("   [" + tasks[taskIndex].getStatusIcon() + "] " + tasks[taskIndex].description);
+                    System.out.println("____________________________________________________________");
                 } else {
-                    tasks[taskCount] = trimmedInput;
+                    tasks[taskCount] = new Task(trimmedInput);
                     taskCount++;
                     System.out.println("____________________________________________________________");
                     System.out.println(" added: " + trimmedInput);
