@@ -12,6 +12,12 @@ then
     rm ACTUAL.TXT
 fi
 
+# delete persisted data from previous run (so tests are deterministic)
+if [ -e "./data/kraken.txt" ]
+then
+    rm ./data/kraken.txt
+fi
+
 # compile the code into the bin folder, terminates if error occurred
 if ! javac -cp ../src/main/java -Xlint:none -d ../bin ../src/main/java/*.java
 then

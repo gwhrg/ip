@@ -1,11 +1,12 @@
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Kraken {
     private static final String LINE = "____________________________________________________________";
 
     public static void main(String[] args) {
-        ArrayList<Task> tasks = new ArrayList<>();
+        Storage storage = new Storage();
+        List<Task> tasks = storage.load();
 
         try (Scanner in = new Scanner(System.in)) {
             System.out.println(LINE);
@@ -30,17 +31,17 @@ public class Kraken {
                         }
                         System.out.println(LINE);
                     } else if (trimmedInput.equals("mark") || trimmedInput.startsWith("mark ")) {
-                        handleMark(trimmedInput, tasks);
+                        handleMark(trimmedInput, tasks, storage);
                     } else if (trimmedInput.equals("unmark") || trimmedInput.startsWith("unmark ")) {
-                        handleUnmark(trimmedInput, tasks);
+                        handleUnmark(trimmedInput, tasks, storage);
                     } else if (trimmedInput.equals("todo") || trimmedInput.startsWith("todo ")) {
-                        handleTodo(trimmedInput, tasks);
+                        handleTodo(trimmedInput, tasks, storage);
                     } else if (trimmedInput.equals("deadline") || trimmedInput.startsWith("deadline ")) {
-                        handleDeadline(trimmedInput, tasks);
+                        handleDeadline(trimmedInput, tasks, storage);
                     } else if (trimmedInput.equals("event") || trimmedInput.startsWith("event ")) {
-                        handleEvent(trimmedInput, tasks);
+                        handleEvent(trimmedInput, tasks, storage);
                     } else if (trimmedInput.equals("delete") || trimmedInput.startsWith("delete ")) {
-                        handleDelete(trimmedInput, tasks);
+                        handleDelete(trimmedInput, tasks, storage);
                     } else {
                         throw new KrakenException("I don't understand that command. "
                                 + "Try: todo, deadline, event, list, mark, unmark, delete, bye");
@@ -54,7 +55,7 @@ public class Kraken {
         }
     }
 
-    private static void handleTodo(String input, ArrayList<Task> tasks) throws KrakenException {
+    private static void handleTodo(String input, List<Task> tasks, Storage storage) throws KrakenException {
         String description;
         if (input.equals("todo")) {
             description = "";
@@ -69,10 +70,11 @@ public class Kraken {
 
         Task newTask = new Todo(description);
         tasks.add(newTask);
+        storage.save(tasks);
         printAddedTask(newTask, tasks.size());
     }
 
-    private static void handleDeadline(String input, ArrayList<Task> tasks) throws KrakenException {
+    private static void handleDeadline(String input, List<Task> tasks, Storage storage) throws KrakenException {
         String remainder;
         if (input.equals("deadline")) {
             remainder = "";
@@ -108,10 +110,11 @@ public class Kraken {
 
         Task newTask = new Deadline(description, by);
         tasks.add(newTask);
+        storage.save(tasks);
         printAddedTask(newTask, tasks.size());
     }
 
-    private static void handleEvent(String input, ArrayList<Task> tasks) throws KrakenException {
+    private static void handleEvent(String input, List<Task> tasks, Storage storage) throws KrakenException {
         String remainder;
         if (input.equals("event")) {
             remainder = "";
@@ -165,10 +168,11 @@ public class Kraken {
 
         Task newTask = new Event(description, from, to);
         tasks.add(newTask);
+        storage.save(tasks);
         printAddedTask(newTask, tasks.size());
     }
 
-    private static void handleMark(String input, ArrayList<Task> tasks) throws KrakenException {
+    private static void handleMark(String input, List<Task> tasks, Storage storage) throws KrakenException {
         String indexStr;
         if (input.equals("mark")) {
             indexStr = "";
@@ -195,13 +199,14 @@ public class Kraken {
         }
 
         tasks.get(taskIndex).markAsDone();
+        storage.save(tasks);
         System.out.println(LINE);
         System.out.println(" Nice! I've marked this task as done:");
         System.out.println("   " + tasks.get(taskIndex));
         System.out.println(LINE);
     }
 
-    private static void handleUnmark(String input, ArrayList<Task> tasks) throws KrakenException {
+    private static void handleUnmark(String input, List<Task> tasks, Storage storage) throws KrakenException {
         String indexStr;
         if (input.equals("unmark")) {
             indexStr = "";
@@ -228,13 +233,14 @@ public class Kraken {
         }
 
         tasks.get(taskIndex).markAsNotDone();
+        storage.save(tasks);
         System.out.println(LINE);
         System.out.println(" OK, I've marked this task as not done yet:");
         System.out.println("   " + tasks.get(taskIndex));
         System.out.println(LINE);
     }
 
-    private static void handleDelete(String input, ArrayList<Task> tasks) throws KrakenException {
+    private static void handleDelete(String input, List<Task> tasks, Storage storage) throws KrakenException {
         String indexStr;
         if (input.equals("delete")) {
             indexStr = "";
@@ -261,6 +267,7 @@ public class Kraken {
         }
 
         Task removedTask = tasks.remove(taskIndex);
+        storage.save(tasks);
         System.out.println(LINE);
         System.out.println(" Noted. I've removed this task:");
         System.out.println("   " + removedTask);
