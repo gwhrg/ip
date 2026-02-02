@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Handles loading/saving Kraken tasks from/to disk using an OS-independent relative path.
@@ -80,10 +79,7 @@ public class Storage {
                 Files.createDirectories(parent);
             }
 
-            List<String> lines = tasks.stream()
-                    .map(this::serialize)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
+            List<String> lines = tasks.stream().map(this::serialize).filter(Objects::nonNull).toList();
 
             Files.write(
                     dataFile,
