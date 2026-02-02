@@ -38,8 +38,8 @@ public class Storage {
      * - If some lines are corrupt, skips those lines and continues.
      * - On IO errors, prints a warning to stderr and returns what was loaded so far (or empty).
      */
-    public ArrayList<Task> load() {
-        ArrayList<Task> tasks = new ArrayList<>();
+    public List<Task> load() {
+        List<Task> tasks = new ArrayList<>();
 
         if (!Files.exists(dataFile)) {
             return tasks;
@@ -73,7 +73,7 @@ public class Storage {
      *
      * Save is silent on stdout; on IO errors it prints a warning to stderr and continues.
      */
-    public void save(ArrayList<Task> tasks) {
+    public void save(List<Task> tasks) {
         try {
             Path parent = dataFile.getParent();
             if (parent != null) {
