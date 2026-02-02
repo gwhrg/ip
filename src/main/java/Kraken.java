@@ -1,3 +1,5 @@
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
 
@@ -30,6 +32,8 @@ public class Kraken {
                             System.out.println(" " + (i + 1) + "." + tasks.get(i));
                         }
                         System.out.println(LINE);
+                    } else if (trimmedInput.equals("on") || trimmedInput.startsWith("on ")) {
+                        handleOn(trimmedInput, tasks);
                     } else if (trimmedInput.equals("mark") || trimmedInput.startsWith("mark ")) {
                         handleMark(trimmedInput, tasks, storage);
                     } else if (trimmedInput.equals("unmark") || trimmedInput.startsWith("unmark ")) {
@@ -44,7 +48,7 @@ public class Kraken {
                         handleDelete(trimmedInput, tasks, storage);
                     } else {
                         throw new KrakenException("I don't understand that command. "
-                                + "Try: todo, deadline, event, list, mark, unmark, delete, bye");
+                                + "Try: todo, deadline, event, list, on, mark, unmark, delete, bye");
                     }
                 } catch (KrakenException e) {
                     System.out.println(LINE);
@@ -108,7 +112,8 @@ public class Kraken {
                     + "Usage: deadline <description> /by <date>");
         }
 
-        Task newTask = new Deadline(description, by);
+        LocalDateTime byDateTime = DateTimeUtil.parseUserDateTime(by);
+        Task newTask = new Deadline(description, byDateTime);
         tasks.add(newTask);
         storage.save(tasks);
         printAddedTask(newTask, tasks.size());
@@ -166,10 +171,68 @@ public class Kraken {
                     + "Usage: event <description> /from <start> /to <end>");
         }
 
-        Task newTask = new Event(description, from, to);
+        LocalDateTime fromDateTime = DateTimeUtil.parseUserDateTime(from);
+        LocalDateTime toDateTime = DateTimeUtil.parseUserDateTime(to);
+        if (fromDateTime.isAfter(toDateTime)) {
+            throw new KrakenException("The /from date/time must not be after /to. "
+                    + "Usage: event <description> /from <start> /to <end>");
+        }
+
+        Task newTask = new Event(description, fromDateTime, toDateTime);
         tasks.add(newTask);
         storage.save(tasks);
         printAddedTask(newTask, tasks.size());
+    }
+
+    private static void handleOn(String input, List<Task> tasks) throws KrakenException {
+        String remainder;
+        if (input.equals("on")) {
+            remainder = "";
+        } else {
+            remainder = input.substring("on ".length()).trim();
+        }
+
+        if (remainder.isEmpty()) {
+            throw new KrakenException("Please specify a date. Usage: on <date>");
+        }
+
+        LocalDate date = DateTimeUtil.parseUserDate(remainder);
+        String formattedDate = DateTimeUtil.formatForDisplay(date.atStartOfDay());
+
+        System.out.println(LINE);
+        System.out.println(" Here are the tasks on " + formattedDate + ":");
+
+        boolean found = false;
+        for (int i = 0; i < tasks.size(); i++) {
+            Task task = tasks.get(i);
+
+            if (task instanceof Deadline) {
+                Deadline d = (Deadline) task;
+                if (d.getBy() != null && d.getBy().toLocalDate().equals(date)) {
+                    System.out.println(" " + (i + 1) + "." + task);
+                    found = true;
+                }
+                continue;
+            }
+
+            if (task instanceof Event) {
+                Event e = (Event) task;
+                if (e.getFrom() != null && e.getTo() != null) {
+                    LocalDate start = e.getFrom().toLocalDate();
+                    LocalDate end = e.getTo().toLocalDate();
+                    boolean isOnDate = !date.isBefore(start) && !date.isAfter(end);
+                    if (isOnDate) {
+                        System.out.println(" " + (i + 1) + "." + task);
+                        found = true;
+                    }
+                }
+            }
+        }
+
+        if (!found) {
+            System.out.println(" No tasks found on " + formattedDate + ".");
+        }
+        System.out.println(LINE);
     }
 
     private static void handleMark(String input, List<Task> tasks, Storage storage) throws KrakenException {

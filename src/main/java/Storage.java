@@ -14,8 +14,8 @@ import java.util.Optional;
  *
  * File format (one task per line, fields separated by " | "):
  * - Todo:     T | 0/1 | <description>
- * - Deadline: D | 0/1 | <description> | <by>
- * - Event:    E | 0/1 | <description> | <from> | <to>
+ * - Deadline: D | 0/1 | <description> | <by (ISO date-time, e.g., 2019-12-02T18:00)>
+ * - Event:    E | 0/1 | <description> | <from (ISO date-time)> | <to (ISO date-time)>
  */
 public class Storage {
     private static final String DELIMITER = " | ";
@@ -103,12 +103,15 @@ public class Storage {
 
         if (task instanceof Deadline) {
             Deadline d = (Deadline) task;
-            return "D" + DELIMITER + doneFlag + DELIMITER + d.getDescription() + DELIMITER + d.getBy();
+            return "D" + DELIMITER + doneFlag + DELIMITER + d.getDescription()
+                    + DELIMITER + DateTimeUtil.formatForStorage(d.getBy());
         }
 
         if (task instanceof Event) {
             Event e = (Event) task;
-            return "E" + DELIMITER + doneFlag + DELIMITER + e.getDescription() + DELIMITER + e.getFrom() + DELIMITER + e.getTo();
+            return "E" + DELIMITER + doneFlag + DELIMITER + e.getDescription()
+                    + DELIMITER + DateTimeUtil.formatForStorage(e.getFrom())
+                    + DELIMITER + DateTimeUtil.formatForStorage(e.getTo());
         }
 
         // Unknown task type; skip persisting it to avoid corrupting the save file.
@@ -144,13 +147,31 @@ public class Storage {
                 warnCorruptLine(line);
                 return Optional.empty();
             }
-            return createTask(new Deadline(parts[2].trim(), parts[3].trim()), isDone, line);
+            try {
+                return createTask(new Deadline(parts[2].trim(), DateTimeUtil.parseStorageDateTime(parts[3].trim())), isDone, line);
+            } catch (KrakenException e) {
+                warnCorruptLine(line);
+                return Optional.empty();
+            }
         case "E":
             if (parts.length != 5) {
                 warnCorruptLine(line);
                 return Optional.empty();
             }
-            return createTask(new Event(parts[2].trim(), parts[3].trim(), parts[4].trim()), isDone, line);
+            try {
+                return createTask(
+                        new Event(
+                                parts[2].trim(),
+                                DateTimeUtil.parseStorageDateTime(parts[3].trim()),
+                                DateTimeUtil.parseStorageDateTime(parts[4].trim())
+                        ),
+                        isDone,
+                        line
+                );
+            } catch (KrakenException e) {
+                warnCorruptLine(line);
+                return Optional.empty();
+            }
         default:
             warnCorruptLine(line);
             return Optional.empty();
@@ -165,7 +186,7 @@ public class Storage {
 
         if (task instanceof Deadline) {
             Deadline d = (Deadline) task;
-            if (d.getBy() == null || d.getBy().trim().isEmpty()) {
+            if (d.getBy() == null) {
                 warnCorruptLine(originalLine);
                 return Optional.empty();
             }
@@ -173,7 +194,7 @@ public class Storage {
 
         if (task instanceof Event) {
             Event e = (Event) task;
-            if (e.getFrom() == null || e.getFrom().trim().isEmpty() || e.getTo() == null || e.getTo().trim().isEmpty()) {
+            if (e.getFrom() == null || e.getTo() == null || e.getFrom().isAfter(e.getTo())) {
                 warnCorruptLine(originalLine);
                 return Optional.empty();
             }
