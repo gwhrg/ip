@@ -148,7 +148,7 @@ public class Storage {
                 return Optional.empty();
             }
             try {
-                return createTask(new Deadline(parts[2].trim(), DateTimeUtil.parseDateTime(parts[3].trim())), isDone, line);
+                return createTask(new Deadline(parts[2].trim(), DateTimeUtil.parseStorageDateTime(parts[3].trim())), isDone, line);
             } catch (KrakenException e) {
                 warnCorruptLine(line);
                 return Optional.empty();
@@ -162,8 +162,8 @@ public class Storage {
                 return createTask(
                         new Event(
                                 parts[2].trim(),
-                                DateTimeUtil.parseDateTime(parts[3].trim()),
-                                DateTimeUtil.parseDateTime(parts[4].trim())
+                                DateTimeUtil.parseStorageDateTime(parts[3].trim()),
+                                DateTimeUtil.parseStorageDateTime(parts[4].trim())
                         ),
                         isDone,
                         line

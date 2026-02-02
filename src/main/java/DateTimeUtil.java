@@ -32,34 +32,32 @@ public class DateTimeUtil {
     private static final DateTimeFormatter USER_DATE_TIME_SLASH =
             DateTimeFormatter.ofPattern("d/M/uuuu HHmm").withResolverStyle(ResolverStyle.STRICT);
 
-    public static LocalDateTime parseDateTime(String raw) throws KrakenException {
+    private static final DateTimeFormatter[] USER_DATE_TIME_FORMATTERS = new DateTimeFormatter[] {
+            USER_DATE_TIME_ISO,
+            USER_DATE_TIME_SLASH
+    };
+
+    private static final DateTimeFormatter[] USER_DATE_FORMATTERS = new DateTimeFormatter[] {
+            USER_DATE_ISO,
+            USER_DATE_SLASH
+    };
+
+    /**
+     * Parses date/time from a user command (rejects ISO date-time with 'T', e.g., 2019-12-02T18:00).
+     */
+    public static LocalDateTime parseUserDateTime(String raw) throws KrakenException {
         String text = (raw == null) ? "" : raw.trim();
         if (text.isEmpty()) {
             throw new KrakenException("Date/time cannot be empty. "
                     + "Use yyyy-MM-dd or d/M/yyyy, optionally followed by HHmm (e.g., 2019-12-02 1800).");
         }
 
-        // 1) Storage-friendly ISO format (and also acceptable as user input)
-        try {
-            return LocalDateTime.parse(text, STORAGE_DATE_TIME);
-        } catch (DateTimeParseException ignored) {
-            // try other formats below
+        LocalDateTime dateTime = tryParseLocalDateTime(text, USER_DATE_TIME_FORMATTERS);
+        if (dateTime != null) {
+            return dateTime;
         }
 
-        // 2) User date + time formats (space-separated)
-        try {
-            return LocalDateTime.parse(text, USER_DATE_TIME_ISO);
-        } catch (DateTimeParseException ignored) {
-            // try next
-        }
-        try {
-            return LocalDateTime.parse(text, USER_DATE_TIME_SLASH);
-        } catch (DateTimeParseException ignored) {
-            // try date-only formats below
-        }
-
-        // 3) Date-only formats (assume start-of-day)
-        LocalDate date = tryParseDateOnly(text);
+        LocalDate date = tryParseLocalDate(text, USER_DATE_FORMATTERS);
         if (date != null) {
             return date.atStartOfDay();
         }
@@ -68,22 +66,43 @@ public class DateTimeUtil {
                 + "Use yyyy-MM-dd or d/M/yyyy, optionally followed by HHmm (e.g., 2019-12-02 1800).");
     }
 
-    public static LocalDate parseDate(String raw) throws KrakenException {
+    /**
+     * Parses a date from a user command.
+     *
+     * Accepts yyyy-MM-dd or d/M/yyyy. Also accepts user date-time formats and uses the date portion.
+     */
+    public static LocalDate parseUserDate(String raw) throws KrakenException {
         String text = (raw == null) ? "" : raw.trim();
         if (text.isEmpty()) {
             throw new KrakenException("Date cannot be empty. Use yyyy-MM-dd or d/M/yyyy (e.g., 2019-12-02).");
         }
 
-        LocalDate date = tryParseDateOnly(text);
+        LocalDate date = tryParseLocalDate(text, USER_DATE_FORMATTERS);
         if (date != null) {
             return date;
         }
 
-        // Allow users to provide a date-time; we use the date portion.
+        // Allow users to provide a date-time in the supported user formats; we use the date portion.
         try {
-            return parseDateTime(text).toLocalDate();
+            return parseUserDateTime(text).toLocalDate();
         } catch (KrakenException e) {
             throw new KrakenException("Invalid date: '" + text + "'. Use yyyy-MM-dd or d/M/yyyy (e.g., 2019-12-02).");
+        }
+    }
+
+    /**
+     * Parses date/time from storage (ISO local date-time, e.g., 2019-12-02T18:00).
+     */
+    public static LocalDateTime parseStorageDateTime(String raw) throws KrakenException {
+        String text = (raw == null) ? "" : raw.trim();
+        if (text.isEmpty()) {
+            throw new KrakenException("Stored date/time cannot be empty.");
+        }
+
+        try {
+            return LocalDateTime.parse(text, STORAGE_DATE_TIME);
+        } catch (DateTimeParseException e) {
+            throw new KrakenException("Invalid stored date/time: '" + text + "'.");
         }
     }
 
@@ -112,17 +131,26 @@ public class DateTimeUtil {
                 && dateTime.getNano() == 0;
     }
 
-    private static LocalDate tryParseDateOnly(String text) {
-        try {
-            return LocalDate.parse(text, USER_DATE_ISO);
-        } catch (DateTimeParseException ignored) {
-            // try next
+    private static LocalDateTime tryParseLocalDateTime(String text, DateTimeFormatter[] formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                return LocalDateTime.parse(text, formatter);
+            } catch (DateTimeParseException ignored) {
+                // try next formatter
+            }
         }
-        try {
-            return LocalDate.parse(text, USER_DATE_SLASH);
-        } catch (DateTimeParseException ignored) {
-            return null;
+        return null;
+    }
+
+    private static LocalDate tryParseLocalDate(String text, DateTimeFormatter[] formatters) {
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                return LocalDate.parse(text, formatter);
+            } catch (DateTimeParseException ignored) {
+                // try next formatter
+            }
         }
+        return null;
     }
 }
 

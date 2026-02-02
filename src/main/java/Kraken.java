@@ -112,7 +112,7 @@ public class Kraken {
                     + "Usage: deadline <description> /by <date>");
         }
 
-        LocalDateTime byDateTime = DateTimeUtil.parseDateTime(by);
+        LocalDateTime byDateTime = DateTimeUtil.parseUserDateTime(by);
         Task newTask = new Deadline(description, byDateTime);
         tasks.add(newTask);
         storage.save(tasks);
@@ -171,8 +171,8 @@ public class Kraken {
                     + "Usage: event <description> /from <start> /to <end>");
         }
 
-        LocalDateTime fromDateTime = DateTimeUtil.parseDateTime(from);
-        LocalDateTime toDateTime = DateTimeUtil.parseDateTime(to);
+        LocalDateTime fromDateTime = DateTimeUtil.parseUserDateTime(from);
+        LocalDateTime toDateTime = DateTimeUtil.parseUserDateTime(to);
         if (fromDateTime.isAfter(toDateTime)) {
             throw new KrakenException("The /from date/time must not be after /to. "
                     + "Usage: event <description> /from <start> /to <end>");
@@ -196,7 +196,7 @@ public class Kraken {
             throw new KrakenException("Please specify a date. Usage: on <date>");
         }
 
-        LocalDate date = DateTimeUtil.parseDate(remainder);
+        LocalDate date = DateTimeUtil.parseUserDate(remainder);
         String formattedDate = DateTimeUtil.formatForDisplay(date.atStartOfDay());
 
         System.out.println(LINE);
