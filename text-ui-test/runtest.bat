@@ -6,6 +6,9 @@ if not exist ..\bin mkdir ..\bin
 REM delete output from previous run
 if exist ACTUAL.TXT del ACTUAL.TXT
 
+REM delete persisted data from previous run (so tests are deterministic)
+if exist data\kraken.txt del data\kraken.txt
+
 REM compile the code into the bin folder
 javac  -cp ..\src\main\java -Xlint:none -d ..\bin ..\src\main\java\*.java
 IF ERRORLEVEL 1 (
