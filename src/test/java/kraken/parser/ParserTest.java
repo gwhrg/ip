@@ -12,6 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import kraken.command.Command;
+import kraken.command.FindCommand;
 import kraken.exception.KrakenException;
 import kraken.storage.Storage;
 import kraken.task.Deadline;
@@ -68,6 +69,23 @@ public class ParserTest {
     public void parse_unknownCommand_throwsKrakenException() {
         KrakenException e = assertThrows(KrakenException.class, () -> Parser.parse("wat"));
         assertTrue(e.getMessage().contains("I don't understand"), e.getMessage());
+    }
+
+    /**
+     * Verifies that {@code find} without a keyword is rejected.
+     */
+    @Test
+    public void parse_findMissingKeyword_throwsKrakenException() {
+        KrakenException e = assertThrows(KrakenException.class, () -> Parser.parse("find"));
+        assertTrue(e.getMessage().contains("Usage: find"), e.getMessage());
+    }
+
+    /**
+     * Verifies that {@code find} parses into a {@link FindCommand}.
+     */
+    @Test
+    public void parse_find_returnsFindCommand() throws KrakenException {
+        assertInstanceOf(FindCommand.class, Parser.parse("find book"));
     }
 
     /**
