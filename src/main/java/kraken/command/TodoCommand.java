@@ -37,4 +37,3 @@ public class TodoCommand extends Command {
         ui.showTaskAdded(newTask, tasks.size());
     }
 }
-

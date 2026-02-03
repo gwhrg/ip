@@ -18,4 +18,3 @@ public class ListCommand extends Command {
         ui.showTaskList(tasks);
     }
 }
-

@@ -45,4 +45,3 @@ public class EventCommand extends Command {
         ui.showTaskAdded(newTask, tasks.size());
     }
 }
-

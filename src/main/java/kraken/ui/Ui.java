@@ -158,4 +158,3 @@ public class Ui {
         System.out.println(" No tasks found on " + formattedDate + ".");
     }
 }
-

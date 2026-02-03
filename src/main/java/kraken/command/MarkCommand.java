@@ -37,4 +37,3 @@ public class MarkCommand extends Command {
         ui.showTaskMarked(task);
     }
 }
-

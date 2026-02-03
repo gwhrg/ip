@@ -35,4 +35,3 @@ public class DeleteCommand extends Command {
         ui.showTaskDeleted(removedTask, tasks.size());
     }
 }
-
