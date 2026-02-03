@@ -31,10 +31,18 @@ public class Storage {
     private static final String SPLIT_REGEX = "\\s\\|\\s";
     private final Path dataFile;
 
+    /**
+     * Creates a {@code Storage} instance that persists to {@code data/kraken.txt}.
+     */
     public Storage() {
         this.dataFile = Paths.get("data", "kraken.txt");
     }
 
+    /**
+     * Creates a {@code Storage} instance that persists to the given file path.
+     *
+     * @param dataFile path to the save file
+     */
     public Storage(Path dataFile) {
         this.dataFile = Objects.requireNonNull(dataFile);
     }
@@ -45,6 +53,8 @@ public class Storage {
      * - If the file doesn't exist, returns an empty list.
      * - If some lines are corrupt, skips those lines and continues.
      * - On IO errors, prints a warning to stderr and returns what was loaded so far (or empty).
+     *
+     * @return tasks loaded from disk (possibly empty)
      */
     public List<Task> load() {
         List<Task> tasks = new ArrayList<>();
@@ -80,6 +90,8 @@ public class Storage {
      * Saves tasks to disk.
      *
      * Save is silent on stdout; on IO errors it prints a warning to stderr and continues.
+     *
+     * @param tasks tasks to persist
      */
     public void save(List<Task> tasks) {
         try {
@@ -103,6 +115,12 @@ public class Storage {
         }
     }
 
+    /**
+     * Serializes a task into a single line suitable for persistence.
+     *
+     * @param task task to serialize
+     * @return a single-line representation, or {@code null} if the task type is unknown
+     */
     private String serialize(Task task) {
         int doneFlag = task.isDone() ? 1 : 0;
 
@@ -128,6 +146,15 @@ public class Storage {
         return null;
     }
 
+    /**
+     * Parses a single persisted line into a {@link Task}.
+     *
+     * <p>If the line is corrupt (wrong number of fields, invalid dates, etc.), a warning is printed
+     * and {@link Optional#empty()} is returned.</p>
+     *
+     * @param line persisted line (already trimmed and non-empty)
+     * @return an {@link Optional} containing the parsed task, or empty if the line is corrupt
+     */
     private Optional<Task> parseLine(String line) {
         String[] parts = line.split(SPLIT_REGEX, -1);
 
@@ -187,6 +214,16 @@ public class Storage {
         }
     }
 
+    /**
+     * Validates a newly created task and applies its completion state.
+     *
+     * <p>If validation fails, a warning is printed and {@link Optional#empty()} is returned.</p>
+     *
+     * @param task the task instance created from parsed fields
+     * @param isDone whether the task should be marked done
+     * @param originalLine original persisted line (used for warning output)
+     * @return an {@link Optional} containing the validated task, or empty if invalid
+     */
     private Optional<Task> createTask(Task task, boolean isDone, String originalLine) {
         if (task.getDescription() == null || task.getDescription().trim().isEmpty()) {
             warnCorruptLine(originalLine);
@@ -215,6 +252,13 @@ public class Storage {
         return Optional.of(task);
     }
 
+    /**
+     * Parses the persisted done flag.
+     *
+     * @param doneStr done flag field from storage
+     * @return {@code Boolean.TRUE} for {@code "1"}, {@code Boolean.FALSE} for {@code "0"}, or
+     *         {@code null} if invalid
+     */
     private Boolean parseDoneFlag(String doneStr) {
         if ("1".equals(doneStr)) {
             return Boolean.TRUE;
@@ -225,6 +269,11 @@ public class Storage {
         return null;
     }
 
+    /**
+     * Prints a warning for a corrupt persisted line.
+     *
+     * @param line the corrupt line content
+     */
     private void warnCorruptLine(String line) {
         System.err.println("Warning: Skipping corrupt line in '" + dataFile + "': " + line);
     }

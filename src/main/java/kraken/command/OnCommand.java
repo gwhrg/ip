@@ -10,13 +10,30 @@ import kraken.task.TaskList;
 import kraken.ui.Ui;
 import kraken.util.DateTimeUtil;
 
+/**
+ * Lists tasks that occur on a specific date.
+ *
+ * <p>Deadlines match when their {@code by} date equals the requested date. Events match when the
+ * requested date falls within their inclusive {@code from}/{@code to} date range.</p>
+ */
 public class OnCommand extends Command {
     private final LocalDate date;
 
+    /**
+     * Creates a command that lists tasks occurring on the given date.
+     *
+     * @param date date to filter by
+     */
     public OnCommand(LocalDate date) {
         this.date = date;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Prints a header for the requested date, then lists matching tasks (if any). If no tasks
+     * match, a \"no tasks found\" message is printed.</p>
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         String formattedDate = DateTimeUtil.formatForDisplay(date.atStartOfDay());

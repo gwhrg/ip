@@ -23,6 +23,16 @@ public class Parser {
     private static final String UNKNOWN_COMMAND_MESSAGE = "I don't understand that command. "
             + "Try: todo, deadline, event, list, on, mark, unmark, delete, bye";
 
+    /**
+     * Parses the given user input into an executable {@link Command}.
+     *
+     * <p>The first token is treated as the command word; the remainder (if any) is passed to a
+     * command-specific parser.</p>
+     *
+     * @param fullCommand full user input line (may be {@code null})
+     * @return a concrete {@link Command} instance
+     * @throws KrakenException if the input is blank, unknown, or fails validation
+     */
     public static Command parse(String fullCommand) throws KrakenException {
         String trimmed = (fullCommand == null) ? "" : fullCommand.trim();
 
@@ -59,6 +69,13 @@ public class Parser {
 
     }
 
+    /**
+     * Parses arguments for the {@code todo} command.
+     *
+     * @param args raw arguments after the command word
+     * @return a {@link TodoCommand}
+     * @throws KrakenException if the description is missing/blank
+     */
     private static Command parseTodo(String args) throws KrakenException {
         String description = (args == null) ? "" : args.trim();
         if (description.isEmpty()) {
@@ -68,6 +85,15 @@ public class Parser {
         return new TodoCommand(description);
     }
 
+    /**
+     * Parses arguments for the {@code deadline} command.
+     *
+     * <p>Expected format: {@code deadline <description> /by <date>}.</p>
+     *
+     * @param args raw arguments after the command word
+     * @return a {@link DeadlineCommand}
+     * @throws KrakenException if required fields are missing or the date/time is invalid
+     */
     private static Command parseDeadline(String args) throws KrakenException {
         String remainder = (args == null) ? "" : args.trim();
 
@@ -101,6 +127,15 @@ public class Parser {
         return new DeadlineCommand(description, byDateTime);
     }
 
+    /**
+     * Parses arguments for the {@code event} command.
+     *
+     * <p>Expected format: {@code event <description> /from <start> /to <end>}.</p>
+     *
+     * @param args raw arguments after the command word
+     * @return an {@link EventCommand}
+     * @throws KrakenException if required fields are missing or the time range is invalid
+     */
     private static Command parseEvent(String args) throws KrakenException {
         String remainder = (args == null) ? "" : args.trim();
 
@@ -158,6 +193,13 @@ public class Parser {
         return new EventCommand(description, fromDateTime, toDateTime);
     }
 
+    /**
+     * Parses arguments for the {@code on} command.
+     *
+     * @param args raw arguments after the command word
+     * @return an {@link OnCommand}
+     * @throws KrakenException if the date is missing or invalid
+     */
     private static Command parseOn(String args) throws KrakenException {
         String remainder = (args == null) ? "" : args.trim();
 
@@ -169,6 +211,16 @@ public class Parser {
         return new OnCommand(date);
     }
 
+    /**
+     * Parses arguments for the {@code mark} command.
+     *
+     * <p>The task number provided by the user is 1-based; this method converts it to a 0-based
+     * index for internal use.</p>
+     *
+     * @param args raw arguments after the command word
+     * @return a {@link MarkCommand}
+     * @throws KrakenException if the index is missing or not a valid integer
+     */
     private static Command parseMark(String args) throws KrakenException {
         String indexStr = (args == null) ? "" : args.trim();
         if (indexStr.isEmpty()) {
@@ -187,6 +239,16 @@ public class Parser {
         return new MarkCommand(taskIndex);
     }
 
+    /**
+     * Parses arguments for the {@code unmark} command.
+     *
+     * <p>The task number provided by the user is 1-based; this method converts it to a 0-based
+     * index for internal use.</p>
+     *
+     * @param args raw arguments after the command word
+     * @return an {@link UnmarkCommand}
+     * @throws KrakenException if the index is missing or not a valid integer
+     */
     private static Command parseUnmark(String args) throws KrakenException {
         String indexStr = (args == null) ? "" : args.trim();
         if (indexStr.isEmpty()) {
@@ -205,6 +267,16 @@ public class Parser {
         return new UnmarkCommand(taskIndex);
     }
 
+    /**
+     * Parses arguments for the {@code delete} command.
+     *
+     * <p>The task number provided by the user is 1-based; this method converts it to a 0-based
+     * index for internal use.</p>
+     *
+     * @param args raw arguments after the command word
+     * @return a {@link DeleteCommand}
+     * @throws KrakenException if the index is missing or not a valid integer
+     */
     private static Command parseDelete(String args) throws KrakenException {
         String indexStr = (args == null) ? "" : args.trim();
         if (indexStr.isEmpty()) {
