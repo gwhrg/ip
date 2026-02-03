@@ -1,11 +1,16 @@
+package kraken.util;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 
+import kraken.exception.KrakenException;
+
 /**
  * Utility helpers for parsing and formatting dates/times.
+ * This class contains only static helpers.
  *
  * Supported user inputs:
  * - yyyy-MM-dd

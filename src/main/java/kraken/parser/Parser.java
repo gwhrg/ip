@@ -1,9 +1,24 @@
-/**
- * Parses user input into executable commands.
- */
+package kraken.parser;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import kraken.command.Command;
+import kraken.command.DeadlineCommand;
+import kraken.command.DeleteCommand;
+import kraken.command.EventCommand;
+import kraken.command.ExitCommand;
+import kraken.command.ListCommand;
+import kraken.command.MarkCommand;
+import kraken.command.OnCommand;
+import kraken.command.TodoCommand;
+import kraken.command.UnmarkCommand;
+import kraken.exception.KrakenException;
+import kraken.util.DateTimeUtil;
+
+/**
+ * Parses user input into executable commands.
+ */
 public class Parser {
     private static final String UNKNOWN_COMMAND_MESSAGE = "I don't understand that command. "
             + "Try: todo, deadline, event, list, on, mark, unmark, delete, bye";
@@ -208,3 +223,4 @@ public class Parser {
         return new DeleteCommand(taskIndex);
     }
 }
+

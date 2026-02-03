@@ -1,6 +1,10 @@
+package kraken.task;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import kraken.exception.KrakenException;
 
 /**
  * Encapsulates the task list and operations on it.
