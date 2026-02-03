@@ -131,6 +131,20 @@ public class Ui {
     }
 
     /**
+     * Prints a header for listing tasks matching a search keyword.
+     */
+    public void showMatchingTasksHeader() {
+        System.out.println(" Here are the matching tasks in your list:");
+    }
+
+    /**
+     * Prints a message indicating that no matching tasks were found.
+     */
+    public void showNoMatchingTasksFound() {
+        System.out.println(" No matching tasks found.");
+    }
+
+    /**
      * Prints a header for tasks that occur on the given date.
      *
      * @param formattedDate date string already formatted for display

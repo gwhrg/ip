@@ -8,6 +8,7 @@ import kraken.command.DeadlineCommand;
 import kraken.command.DeleteCommand;
 import kraken.command.EventCommand;
 import kraken.command.ExitCommand;
+import kraken.command.FindCommand;
 import kraken.command.ListCommand;
 import kraken.command.MarkCommand;
 import kraken.command.OnCommand;
@@ -21,7 +22,7 @@ import kraken.util.DateTimeUtil;
  */
 public class Parser {
     private static final String UNKNOWN_COMMAND_MESSAGE = "I don't understand that command. "
-            + "Try: todo, deadline, event, list, on, mark, unmark, delete, bye";
+            + "Try: todo, deadline, event, list, find, on, mark, unmark, delete, bye";
 
     /**
      * Parses the given user input into an executable {@link Command}.
@@ -49,6 +50,8 @@ public class Parser {
             return new ExitCommand();
         case "list":
             return new ListCommand();
+        case "find":
+            return parseFind(args);
         case "todo":
             return parseTodo(args);
         case "deadline":
@@ -67,6 +70,21 @@ public class Parser {
             throw new KrakenException(UNKNOWN_COMMAND_MESSAGE);
         }
 
+    }
+
+    /**
+     * Parses arguments for the {@code find} command.
+     *
+     * @param args raw arguments after the command word
+     * @return a {@link FindCommand}
+     * @throws KrakenException if the keyword is missing/blank
+     */
+    private static Command parseFind(String args) throws KrakenException {
+        String keyword = (args == null) ? "" : args.trim();
+        if (keyword.isEmpty()) {
+            throw new KrakenException("Please specify a keyword. Usage: find <keyword>");
+        }
+        return new FindCommand(keyword);
     }
 
     /**
