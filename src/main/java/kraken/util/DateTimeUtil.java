@@ -48,7 +48,13 @@ public class DateTimeUtil {
     };
 
     /**
-     * Parses date/time from a user command (rejects ISO date-time with 'T', e.g., 2019-12-02T18:00).
+     * Parses a date/time from a user command string.
+     *
+     * <p>Rejects ISO date-time values containing {@code 'T'} (e.g., {@code 2019-12-02T18:00}).</p>
+     *
+     * @param raw raw user input
+     * @return parsed date/time (date-only inputs default to start of day)
+     * @throws KrakenException if the input is blank or cannot be parsed
      */
     public static LocalDateTime parseUserDateTime(String raw) throws KrakenException {
         String text = (raw == null) ? "" : raw.trim();
@@ -75,6 +81,10 @@ public class DateTimeUtil {
      * Parses a date from a user command.
      *
      * Accepts yyyy-MM-dd or d/M/yyyy. Also accepts user date-time formats and uses the date portion.
+     *
+     * @param raw raw user input
+     * @return parsed date
+     * @throws KrakenException if the input is blank or cannot be parsed
      */
     public static LocalDate parseUserDate(String raw) throws KrakenException {
         String text = (raw == null) ? "" : raw.trim();
@@ -97,6 +107,10 @@ public class DateTimeUtil {
 
     /**
      * Parses date/time from storage (ISO local date-time, e.g., 2019-12-02T18:00).
+     *
+     * @param raw raw stored date/time value
+     * @return parsed date/time
+     * @throws KrakenException if the value is blank or invalid
      */
     public static LocalDateTime parseStorageDateTime(String raw) throws KrakenException {
         String text = (raw == null) ? "" : raw.trim();
@@ -111,6 +125,14 @@ public class DateTimeUtil {
         }
     }
 
+    /**
+     * Formats a date/time for user-facing display.
+     *
+     * <p>If the time is exactly midnight, only the date portion is shown.</p>
+     *
+     * @param dateTime date/time to format
+     * @return formatted display string, or an empty string if {@code dateTime} is {@code null}
+     */
     public static String formatForDisplay(LocalDateTime dateTime) {
         if (dateTime == null) {
             return "";
@@ -121,6 +143,12 @@ public class DateTimeUtil {
         return dateTime.format(DISPLAY_DATE_TIME);
     }
 
+    /**
+     * Formats a date/time for persistence.
+     *
+     * @param dateTime date/time to format
+     * @return ISO local date-time string, or an empty string if {@code dateTime} is {@code null}
+     */
     public static String formatForStorage(LocalDateTime dateTime) {
         if (dateTime == null) {
             return "";
@@ -128,6 +156,12 @@ public class DateTimeUtil {
         return dateTime.format(STORAGE_DATE_TIME);
     }
 
+    /**
+     * Returns whether the given date/time is exactly midnight (00:00:00.000000000).
+     *
+     * @param dateTime date/time to check
+     * @return {@code true} if {@code dateTime} is midnight
+     */
     public static boolean isMidnight(LocalDateTime dateTime) {
         return dateTime != null
                 && dateTime.getHour() == 0
@@ -136,6 +170,13 @@ public class DateTimeUtil {
                 && dateTime.getNano() == 0;
     }
 
+    /**
+     * Tries to parse the given text as a {@link LocalDateTime} using the provided formatters.
+     *
+     * @param text input to parse
+     * @param formatters candidate formatters to try in order
+     * @return parsed date/time, or {@code null} if parsing fails for all formatters
+     */
     private static LocalDateTime tryParseLocalDateTime(String text, DateTimeFormatter[] formatters) {
         for (DateTimeFormatter formatter : formatters) {
             try {
@@ -147,6 +188,13 @@ public class DateTimeUtil {
         return null;
     }
 
+    /**
+     * Tries to parse the given text as a {@link LocalDate} using the provided formatters.
+     *
+     * @param text input to parse
+     * @param formatters candidate formatters to try in order
+     * @return parsed date, or {@code null} if parsing fails for all formatters
+     */
     private static LocalDate tryParseLocalDate(String text, DateTimeFormatter[] formatters) {
         for (DateTimeFormatter formatter : formatters) {
             try {
