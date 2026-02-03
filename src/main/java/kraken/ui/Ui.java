@@ -1,4 +1,9 @@
+package kraken.ui;
+
 import java.util.Scanner;
+
+import kraken.task.Task;
+import kraken.task.TaskList;
 
 /**
  * Handles all interactions with the user (input/output).

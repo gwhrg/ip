@@ -1,4 +1,12 @@
+package kraken.command;
+
 import java.time.LocalDateTime;
+
+import kraken.storage.Storage;
+import kraken.task.Deadline;
+import kraken.task.Task;
+import kraken.task.TaskList;
+import kraken.ui.Ui;
 
 public class DeadlineCommand extends Command {
     private final String description;

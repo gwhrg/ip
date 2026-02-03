@@ -1,3 +1,10 @@
+package kraken.command;
+
+import kraken.exception.KrakenException;
+import kraken.storage.Storage;
+import kraken.task.TaskList;
+import kraken.ui.Ui;
+
 /**
  * Represents an executable user command.
  */

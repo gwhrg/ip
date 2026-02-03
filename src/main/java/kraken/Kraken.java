@@ -1,3 +1,12 @@
+package kraken;
+
+import kraken.command.Command;
+import kraken.exception.KrakenException;
+import kraken.parser.Parser;
+import kraken.storage.Storage;
+import kraken.task.TaskList;
+import kraken.ui.Ui;
+
 public class Kraken {
     private final Storage storage;
     private final TaskList tasks;
@@ -33,3 +42,4 @@ public class Kraken {
         }
     }
 }
+
