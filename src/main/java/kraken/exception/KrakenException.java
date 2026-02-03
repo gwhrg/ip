@@ -13,4 +13,3 @@ public class KrakenException extends Exception {
         super(message);
     }
 }
-

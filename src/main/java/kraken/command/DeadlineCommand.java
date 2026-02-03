@@ -42,4 +42,3 @@ public class DeadlineCommand extends Command {
         ui.showTaskAdded(newTask, tasks.size());
     }
 }
-

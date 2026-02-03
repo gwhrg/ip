@@ -55,4 +55,3 @@ public class Event extends Task {
                 + " to: " + DateTimeUtil.formatForDisplay(to) + ")";
     }
 }
-

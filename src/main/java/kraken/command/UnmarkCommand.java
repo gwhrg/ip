@@ -37,4 +37,3 @@ public class UnmarkCommand extends Command {
         ui.showTaskUnmarked(task);
     }
 }
-
