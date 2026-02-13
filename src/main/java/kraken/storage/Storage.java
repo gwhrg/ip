@@ -22,9 +22,9 @@ import kraken.util.DateTimeUtil;
  * Handles loading/saving Kraken tasks from/to disk using an OS-independent relative path.
  *
  * File format (one task per line, fields separated by " | "):
- * - Todo:     T | 0/1 | <description>
- * - Deadline: D | 0/1 | <description> | <by (ISO date-time, e.g., 2019-12-02T18:00)>
- * - Event:    E | 0/1 | <description> | <from (ISO date-time)> | <to (ISO date-time)>
+ * - Todo:     {@code T | 0/1 | [description]}
+ * - Deadline: {@code D | 0/1 | [description] | [by ISO date-time, e.g., 2019-12-02T18:00]}
+ * - Event:    {@code E | 0/1 | [description] | [from ISO date-time] | [to ISO date-time]}
  */
 public class Storage {
     private static final String DELIMITER = " | ";
@@ -184,7 +184,11 @@ public class Storage {
                 return Optional.empty();
             }
             try {
-                return createTask(new Deadline(parts[2].trim(), DateTimeUtil.parseStorageDateTime(parts[3].trim())), isDone, line);
+                return createTask(
+                        new Deadline(parts[2].trim(), DateTimeUtil.parseStorageDateTime(parts[3].trim())),
+                        isDone,
+                        line
+                );
             } catch (KrakenException e) {
                 warnCorruptLine(line);
                 return Optional.empty();

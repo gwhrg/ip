@@ -38,13 +38,13 @@ public class DateTimeUtil {
             DateTimeFormatter.ofPattern("d/M/uuuu HHmm").withResolverStyle(ResolverStyle.STRICT);
 
     private static final DateTimeFormatter[] USER_DATE_TIME_FORMATTERS = new DateTimeFormatter[] {
-            USER_DATE_TIME_ISO,
-            USER_DATE_TIME_SLASH
+        USER_DATE_TIME_ISO,
+        USER_DATE_TIME_SLASH
     };
 
     private static final DateTimeFormatter[] USER_DATE_FORMATTERS = new DateTimeFormatter[] {
-            USER_DATE_ISO,
-            USER_DATE_SLASH
+        USER_DATE_ISO,
+        USER_DATE_SLASH
     };
 
     /**

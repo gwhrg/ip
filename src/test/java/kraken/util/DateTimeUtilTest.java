@@ -91,7 +91,8 @@ public class DateTimeUtilTest {
      */
     @Test
     public void parseUserDateTime_invalidTime_throwsKrakenException() {
-        KrakenException e = assertThrows(KrakenException.class, () -> DateTimeUtil.parseUserDateTime("2019-12-02 2460"));
+        String input = "2019-12-02 2460";
+        KrakenException e = assertThrows(KrakenException.class, () -> DateTimeUtil.parseUserDateTime(input));
         assertTrue(e.getMessage().contains("Invalid date/time"), e.getMessage());
     }
 
@@ -100,7 +101,8 @@ public class DateTimeUtilTest {
      */
     @Test
     public void parseUserDateTime_isoWithT_rejected() {
-        KrakenException e = assertThrows(KrakenException.class, () -> DateTimeUtil.parseUserDateTime("2019-12-02T18:00"));
+        String input = "2019-12-02T18:00";
+        KrakenException e = assertThrows(KrakenException.class, () -> DateTimeUtil.parseUserDateTime(input));
         assertTrue(e.getMessage().contains("Invalid date/time"), e.getMessage());
     }
 }

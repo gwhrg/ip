@@ -122,7 +122,8 @@ public class ParserTest {
      */
     @Test
     public void parse_deadlineInvalidByDate_throwsKrakenException() {
-        KrakenException e = assertThrows(KrakenException.class, () -> Parser.parse("deadline return book /by 2019-02-29"));
+        String command = "deadline return book /by 2019-02-29";
+        KrakenException e = assertThrows(KrakenException.class, () -> Parser.parse(command));
         assertTrue(e.getMessage().contains("Invalid date/time"), e.getMessage());
     }
 
@@ -131,7 +132,8 @@ public class ParserTest {
      */
     @Test
     public void parse_eventMissingFromMarker_throwsKrakenException() {
-        KrakenException e = assertThrows(KrakenException.class, () -> Parser.parse("event meeting /to 2019-12-02 1200"));
+        String command = "event meeting /to 2019-12-02 1200";
+        KrakenException e = assertThrows(KrakenException.class, () -> Parser.parse(command));
         assertTrue(e.getMessage().contains("requires a /from"), e.getMessage());
     }
 
@@ -140,7 +142,8 @@ public class ParserTest {
      */
     @Test
     public void parse_eventMissingToMarker_throwsKrakenException() {
-        KrakenException e = assertThrows(KrakenException.class, () -> Parser.parse("event meeting /from 2019-12-02 1100"));
+        String command = "event meeting /from 2019-12-02 1100";
+        KrakenException e = assertThrows(KrakenException.class, () -> Parser.parse(command));
         assertTrue(e.getMessage().contains("requires a /to"), e.getMessage());
     }
 
@@ -149,10 +152,8 @@ public class ParserTest {
      */
     @Test
     public void parse_eventToBeforeFromMarker_throwsKrakenException() {
-        KrakenException e = assertThrows(
-                KrakenException.class,
-                () -> Parser.parse("event meeting /to 2019-12-02 1200 /from 2019-12-02 1100")
-        );
+        String command = "event meeting /to 2019-12-02 1200 /from 2019-12-02 1100";
+        KrakenException e = assertThrows(KrakenException.class, () -> Parser.parse(command));
         assertTrue(e.getMessage().contains("/from marker must come before /to"), e.getMessage());
     }
 
@@ -161,10 +162,8 @@ public class ParserTest {
      */
     @Test
     public void parse_eventFromAfterTo_throwsKrakenException() {
-        KrakenException e = assertThrows(
-                KrakenException.class,
-                () -> Parser.parse("event meeting /from 2019-12-02 1200 /to 2019-12-02 1100")
-        );
+        String command = "event meeting /from 2019-12-02 1200 /to 2019-12-02 1100";
+        KrakenException e = assertThrows(KrakenException.class, () -> Parser.parse(command));
         assertTrue(e.getMessage().contains("must not be after"), e.getMessage());
     }
 
@@ -249,7 +248,7 @@ public class ParserTest {
      * Verifies that {@code mark} uses 1-based task numbers from user input.
      */
     @Test
-    public void execute_mark_marksCorrectTask_oneBasedIndex() throws KrakenException {
+    public void execute_mark_marksCorrectTask() throws KrakenException {
         TaskList tasks = new TaskList();
         tasks.add(new Todo("task 1"));
         tasks.add(new Todo("task 2"));
