@@ -5,63 +5,59 @@ import kraken.exception.KrakenException;
 import kraken.parser.Parser;
 import kraken.storage.Storage;
 import kraken.task.TaskList;
-import kraken.ui.Ui;
+import kraken.ui.GuiUi;
 
 /**
- * Entry point for the Kraken task manager chatbot.
- *
- * <p>The application reads commands from standard input, parses them into {@link Command} objects,
- * executes them, and persists task changes via {@link Storage}.</p>
+ * The Kraken task manager chatbot engine.
  */
 public class Kraken {
     private final Storage storage;
     private final TaskList tasks;
-    private final Ui ui;
+    private boolean shouldExit;
 
     /**
-     * Constructs a {@code Kraken} instance with the default UI and storage.
+     * Constructs a {@code Kraken} instance with default storage.
      *
      * <p>Tasks are loaded from disk on startup.</p>
      */
     public Kraken() {
-        this.ui = new Ui();
         this.storage = new Storage();
         this.tasks = new TaskList(storage.load());
+        this.shouldExit = false;
     }
 
     /**
-     * Launches Kraken.
-     *
-     * @param args command-line arguments (unused)
+     * Returns the welcome message shown at startup.
      */
-    public static void main(String[] args) {
-        new Kraken().run();
-    }
-
-    /**
-     * Runs the main command-processing loop.
-     *
-     * <p>Shows the welcome message, then repeatedly reads a command, executes it, and prints a
-     * separator line. The loop terminates when an exit command is executed or when there is no more
-     * input.</p>
-     */
-    public void run() {
+    public String getWelcomeMessage() {
+        GuiUi ui = new GuiUi();
         ui.showWelcome();
+        return ui.consumeOutput();
+    }
 
-        boolean isExit = false;
-        while (!isExit && ui.hasNextCommand()) {
-            String fullCommand = ui.readCommand();
-
-            try {
-                ui.showLine();
-                Command command = Parser.parse(fullCommand);
-                command.execute(tasks, ui, storage);
-                isExit = command.isExit();
-            } catch (KrakenException e) {
-                ui.showError(e.getMessage());
-            } finally {
-                ui.showLine();
-            }
+    /**
+     * Generates a response for the user's input.
+     *
+     * @param input user input line
+     * @return Kraken's response text
+     */
+    public String getResponse(String input) {
+        GuiUi ui = new GuiUi();
+        try {
+            Command command = Parser.parse(input);
+            command.execute(tasks, ui, storage);
+            shouldExit = command.isExit();
+        } catch (KrakenException e) {
+            shouldExit = false;
+            ui.showError(e.getMessage());
         }
+        return ui.consumeOutput();
+    }
+
+    /**
+     * Whether the application should exit after the last processed input.
+     */
+    public boolean isExit() {
+        return shouldExit;
     }
 }

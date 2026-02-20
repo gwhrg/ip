@@ -277,122 +277,67 @@ public class ParserTest {
     /**
      * No-op UI used in tests to prevent writing to stdout.
      */
-    private static class NoOpUi extends Ui {
-        /**
-         * {@inheritDoc}
-         *
-         * <p>No-op in tests.</p>
-         */
-        @Override
-        public void showLine() {
-            // no-op
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * <p>No-op in tests.</p>
-         */
+    private static class NoOpUi implements Ui {
         @Override
         public void showWelcome() {
             // no-op
         }
 
-        /**
-         * {@inheritDoc}
-         *
-         * <p>No-op in tests.</p>
-         */
         @Override
         public void showBye() {
             // no-op
         }
 
-        /**
-         * {@inheritDoc}
-         *
-         * <p>No-op in tests.</p>
-         */
         @Override
         public void showError(String message) {
             // no-op
         }
 
-        /**
-         * {@inheritDoc}
-         *
-         * <p>No-op in tests.</p>
-         */
         @Override
         public void showTaskAdded(Task task, int taskCount) {
             // no-op
         }
 
-        /**
-         * {@inheritDoc}
-         *
-         * <p>No-op in tests.</p>
-         */
         @Override
         public void showTaskDeleted(Task task, int taskCount) {
             // no-op
         }
 
-        /**
-         * {@inheritDoc}
-         *
-         * <p>No-op in tests.</p>
-         */
         @Override
         public void showTaskMarked(Task task) {
             // no-op
         }
 
-        /**
-         * {@inheritDoc}
-         *
-         * <p>No-op in tests.</p>
-         */
         @Override
         public void showTaskUnmarked(Task task) {
             // no-op
         }
 
-        /**
-         * {@inheritDoc}
-         *
-         * <p>No-op in tests.</p>
-         */
         @Override
         public void showTaskList(TaskList tasks) {
             // no-op
         }
 
-        /**
-         * {@inheritDoc}
-         *
-         * <p>No-op in tests.</p>
-         */
+        @Override
+        public void showMatchingTasksHeader() {
+            // no-op
+        }
+
+        @Override
+        public void showNoMatchingTasksFound() {
+            // no-op
+        }
+
         @Override
         public void showTasksOnDateHeader(String formattedDate) {
             // no-op
         }
 
-        /**
-         * {@inheritDoc}
-         *
-         * <p>No-op in tests.</p>
-         */
         @Override
         public void showTaskWithIndex(int displayIndex, Task task) {
             // no-op
         }
 
-        /**
-         * {@inheritDoc}
-         *
-         * <p>No-op in tests.</p>
-         */
         @Override
         public void showNoTasksFoundOn(String formattedDate) {
             // no-op
