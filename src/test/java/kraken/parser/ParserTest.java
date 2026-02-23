@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 
 import kraken.command.Command;
 import kraken.command.FindCommand;
+import kraken.command.ListCommand;
+import kraken.command.TodoCommand;
 import kraken.exception.KrakenException;
 import kraken.storage.Storage;
 import kraken.task.Deadline;
@@ -86,6 +88,34 @@ public class ParserTest {
     @Test
     public void parse_find_returnsFindCommand() throws KrakenException {
         assertInstanceOf(FindCommand.class, Parser.parse("find book"));
+    }
+
+    /**
+     * Verifies that alias {@code t} parses into a {@link TodoCommand} and adds a todo.
+     */
+    @Test
+    public void parse_aliasT_parsesAsTodo() throws KrakenException {
+        assertInstanceOf(TodoCommand.class, Parser.parse("t buy milk"));
+        TaskList tasks = new TaskList();
+        execute("t buy milk", tasks);
+        assertEquals(1, tasks.size());
+        assertEquals("buy milk", tasks.get(0).getDescription());
+    }
+
+    /**
+     * Verifies that alias {@code l} parses into a {@link ListCommand}.
+     */
+    @Test
+    public void parse_aliasL_parsesAsList() throws KrakenException {
+        assertInstanceOf(ListCommand.class, Parser.parse("l"));
+    }
+
+    /**
+     * Verifies that alias {@code f} parses into a {@link FindCommand}.
+     */
+    @Test
+    public void parse_aliasF_parsesAsFind() throws KrakenException {
+        assertInstanceOf(FindCommand.class, Parser.parse("f book"));
     }
 
     /**
