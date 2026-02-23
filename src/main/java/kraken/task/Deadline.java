@@ -20,6 +20,7 @@ public class Deadline extends Task {
     public Deadline(String description, LocalDateTime by) {
         super(description);
         this.by = by;
+        assert this.by != null : "Deadline date/time must not be null";
     }
 
     /**
@@ -28,6 +29,7 @@ public class Deadline extends Task {
      * @return due date/time
      */
     public LocalDateTime getBy() {
+        assert by != null : "Deadline date/time invariant violated";
         return by;
     }
 

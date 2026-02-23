@@ -16,6 +16,7 @@ public class Task {
      */
     public Task(String description) {
         this.description = description;
+        assert this.description != null : "Task description must not be null";
         this.isDone = false;
     }
 
@@ -25,6 +26,7 @@ public class Task {
      * @return description text
      */
     public String getDescription() {
+        assert description != null : "Task description invariant violated";
         return description;
     }
 
@@ -70,6 +72,7 @@ public class Task {
      */
     @Override
     public String toString() {
+        assert description != null : "Task description invariant violated";
         return "[" + getStatusIcon() + "] " + description;
     }
 }
