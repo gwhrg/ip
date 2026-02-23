@@ -20,7 +20,7 @@ public abstract class Command {
     public abstract void execute(TaskList tasks, Ui ui, Storage storage) throws KrakenException;
 
     /**
-     * Whether this command should terminate the application.
+     * Returns whether this command should terminate the application.
      *
      * @return {@code true} if the application should exit after executing this command
      */

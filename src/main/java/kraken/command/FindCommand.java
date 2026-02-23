@@ -34,17 +34,17 @@ public class FindCommand extends Command {
         ui.showMatchingTasksHeader();
 
         String needle = keyword.toLowerCase(Locale.ROOT);
-        boolean found = false;
+        boolean hasMatchingTasks = false;
         for (int i = 0; i < tasks.size(); i++) {
             Task task = tasks.get(i);
             String description = task.getDescription();
             if (description != null && description.toLowerCase(Locale.ROOT).contains(needle)) {
                 ui.showTaskWithIndex(i + 1, task);
-                found = true;
+                hasMatchingTasks = true;
             }
         }
 
-        if (!found) {
+        if (!hasMatchingTasks) {
             ui.showNoMatchingTasksFound();
         }
     }

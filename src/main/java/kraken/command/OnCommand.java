@@ -39,7 +39,7 @@ public class OnCommand extends Command {
         String formattedDate = DateTimeUtil.formatForDisplay(date.atStartOfDay());
         ui.showTasksOnDateHeader(formattedDate);
 
-        boolean found = false;
+        boolean hasTasksOnDate = false;
         for (int i = 0; i < tasks.size(); i++) {
             Task task = tasks.get(i);
 
@@ -47,7 +47,7 @@ public class OnCommand extends Command {
                 Deadline d = (Deadline) task;
                 if (d.getBy() != null && d.getBy().toLocalDate().equals(date)) {
                     ui.showTaskWithIndex(i + 1, task);
-                    found = true;
+                    hasTasksOnDate = true;
                 }
                 continue;
             }
@@ -60,13 +60,13 @@ public class OnCommand extends Command {
                     boolean isOnDate = !date.isBefore(start) && !date.isAfter(end);
                     if (isOnDate) {
                         ui.showTaskWithIndex(i + 1, task);
-                        found = true;
+                        hasTasksOnDate = true;
                     }
                 }
             }
         }
 
-        if (!found) {
+        if (!hasTasksOnDate) {
             ui.showNoTasksFoundOn(formattedDate);
         }
     }

@@ -55,7 +55,7 @@ public class Kraken {
     }
 
     /**
-     * Whether the application should exit after the last processed input.
+     * Returns whether the application should exit after the last processed input.
      */
     public boolean isExit() {
         return shouldExit;
