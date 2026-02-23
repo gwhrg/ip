@@ -170,50 +170,63 @@ public class Storage {
             warnCorruptLine(line);
             return Optional.empty();
         }
+        boolean isDoneFlag = isDone;
 
         switch (type) {
         case "T":
-            if (parts.length != 3) {
-                warnCorruptLine(line);
-                return Optional.empty();
-            }
-            return createTask(new Todo(parts[2].trim()), isDone, line);
+            return parseTodoLine(parts, isDoneFlag, line);
         case "D":
-            if (parts.length != 4) {
-                warnCorruptLine(line);
-                return Optional.empty();
-            }
-            try {
-                return createTask(
-                        new Deadline(parts[2].trim(), DateTimeUtil.parseStorageDateTime(parts[3].trim())),
-                        isDone,
-                        line
-                );
-            } catch (KrakenException e) {
-                warnCorruptLine(line);
-                return Optional.empty();
-            }
+            return parseDeadlineLine(parts, isDoneFlag, line);
         case "E":
-            if (parts.length != 5) {
-                warnCorruptLine(line);
-                return Optional.empty();
-            }
-            try {
-                return createTask(
-                        new Event(
-                                parts[2].trim(),
-                                DateTimeUtil.parseStorageDateTime(parts[3].trim()),
-                                DateTimeUtil.parseStorageDateTime(parts[4].trim())
-                        ),
-                        isDone,
-                        line
-                );
-            } catch (KrakenException e) {
-                warnCorruptLine(line);
-                return Optional.empty();
-            }
+            return parseEventLine(parts, isDoneFlag, line);
         default:
             warnCorruptLine(line);
+            return Optional.empty();
+        }
+    }
+
+    private Optional<Task> parseTodoLine(String[] parts, boolean isDone, String originalLine) {
+        if (parts.length != 3) {
+            warnCorruptLine(originalLine);
+            return Optional.empty();
+        }
+        return createTask(new Todo(parts[2].trim()), isDone, originalLine);
+    }
+
+    private Optional<Task> parseDeadlineLine(String[] parts, boolean isDone, String originalLine) {
+        if (parts.length != 4) {
+            warnCorruptLine(originalLine);
+            return Optional.empty();
+        }
+        try {
+            return createTask(
+                    new Deadline(parts[2].trim(), DateTimeUtil.parseStorageDateTime(parts[3].trim())),
+                    isDone,
+                    originalLine
+            );
+        } catch (KrakenException e) {
+            warnCorruptLine(originalLine);
+            return Optional.empty();
+        }
+    }
+
+    private Optional<Task> parseEventLine(String[] parts, boolean isDone, String originalLine) {
+        if (parts.length != 5) {
+            warnCorruptLine(originalLine);
+            return Optional.empty();
+        }
+        try {
+            return createTask(
+                    new Event(
+                            parts[2].trim(),
+                            DateTimeUtil.parseStorageDateTime(parts[3].trim()),
+                            DateTimeUtil.parseStorageDateTime(parts[4].trim())
+                    ),
+                    isDone,
+                    originalLine
+            );
+        } catch (KrakenException e) {
+            warnCorruptLine(originalLine);
             return Optional.empty();
         }
     }

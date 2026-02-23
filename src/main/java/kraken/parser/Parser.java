@@ -23,6 +23,23 @@ import kraken.util.DateTimeUtil;
 public class Parser {
     private static final String UNKNOWN_COMMAND_MESSAGE = "I don't understand that command. "
             + "Try: todo, deadline, event, list, find, on, mark, unmark, delete, bye";
+    private static final String DEADLINE_USAGE = "Usage: deadline <description> /by <date>";
+    private static final String EVENT_USAGE = "Usage: event <description> /from <start> /to <end>";
+
+    private static int requireMarkerIndex(String input, String marker, String errorMessage) throws KrakenException {
+        int index = input.indexOf(marker);
+        if (index == -1) {
+            throw new KrakenException(errorMessage);
+        }
+        return index;
+    }
+
+    private static String requireNonEmpty(String value, String errorMessage) throws KrakenException {
+        if (value.isEmpty()) {
+            throw new KrakenException(errorMessage);
+        }
+        return value;
+    }
 
     /**
      * Parses the given user input into an executable {@link Command}.
@@ -115,31 +132,16 @@ public class Parser {
     private static Command parseDeadline(String args) throws KrakenException {
         String remainder = (args == null) ? "" : args.trim();
 
-        if (remainder.isEmpty()) {
-            throw new KrakenException("The description of a deadline cannot be empty. "
-                    + "Usage: deadline <description> /by <date>");
-        }
+        requireNonEmpty(remainder, "The description of a deadline cannot be empty. " + DEADLINE_USAGE);
 
         String byMarker = "/by";
-        int byIndex = remainder.indexOf(byMarker);
-
-        if (byIndex == -1) {
-            throw new KrakenException("A deadline requires a /by date. "
-                    + "Usage: deadline <description> /by <date>");
-        }
+        int byIndex = requireMarkerIndex(remainder, byMarker, "A deadline requires a /by date. " + DEADLINE_USAGE);
 
         String description = remainder.substring(0, byIndex).trim();
         String by = remainder.substring(byIndex + byMarker.length()).trim();
 
-        if (description.isEmpty()) {
-            throw new KrakenException("The description of a deadline cannot be empty. "
-                    + "Usage: deadline <description> /by <date>");
-        }
-
-        if (by.isEmpty()) {
-            throw new KrakenException("The /by date of a deadline cannot be empty. "
-                    + "Usage: deadline <description> /by <date>");
-        }
+        requireNonEmpty(description, "The description of a deadline cannot be empty. " + DEADLINE_USAGE);
+        requireNonEmpty(by, "The /by date of a deadline cannot be empty. " + DEADLINE_USAGE);
 
         LocalDateTime byDateTime = DateTimeUtil.parseUserDateTime(by);
         return new DeadlineCommand(description, byDateTime);
@@ -157,55 +159,29 @@ public class Parser {
     private static Command parseEvent(String args) throws KrakenException {
         String remainder = (args == null) ? "" : args.trim();
 
-        if (remainder.isEmpty()) {
-            throw new KrakenException("The description of an event cannot be empty. "
-                    + "Usage: event <description> /from <start> /to <end>");
-        }
+        requireNonEmpty(remainder, "The description of an event cannot be empty. " + EVENT_USAGE);
 
         String fromMarker = "/from";
         String toMarker = "/to";
-        int fromIndex = remainder.indexOf(fromMarker);
-        int toIndex = remainder.indexOf(toMarker);
-
-        if (fromIndex == -1) {
-            throw new KrakenException("An event requires a /from time. "
-                    + "Usage: event <description> /from <start> /to <end>");
-        }
-
-        if (toIndex == -1) {
-            throw new KrakenException("An event requires a /to time. "
-                    + "Usage: event <description> /from <start> /to <end>");
-        }
+        int fromIndex = requireMarkerIndex(remainder, fromMarker, "An event requires a /from time. " + EVENT_USAGE);
+        int toIndex = requireMarkerIndex(remainder, toMarker, "An event requires a /to time. " + EVENT_USAGE);
 
         if (toIndex < fromIndex) {
-            throw new KrakenException("The /from marker must come before /to. "
-                    + "Usage: event <description> /from <start> /to <end>");
+            throw new KrakenException("The /from marker must come before /to. " + EVENT_USAGE);
         }
 
         String description = remainder.substring(0, fromIndex).trim();
         String from = remainder.substring(fromIndex + fromMarker.length(), toIndex).trim();
         String to = remainder.substring(toIndex + toMarker.length()).trim();
 
-        if (description.isEmpty()) {
-            throw new KrakenException("The description of an event cannot be empty. "
-                    + "Usage: event <description> /from <start> /to <end>");
-        }
-
-        if (from.isEmpty()) {
-            throw new KrakenException("The /from time of an event cannot be empty. "
-                    + "Usage: event <description> /from <start> /to <end>");
-        }
-
-        if (to.isEmpty()) {
-            throw new KrakenException("The /to time of an event cannot be empty. "
-                    + "Usage: event <description> /from <start> /to <end>");
-        }
+        requireNonEmpty(description, "The description of an event cannot be empty. " + EVENT_USAGE);
+        requireNonEmpty(from, "The /from time of an event cannot be empty. " + EVENT_USAGE);
+        requireNonEmpty(to, "The /to time of an event cannot be empty. " + EVENT_USAGE);
 
         LocalDateTime fromDateTime = DateTimeUtil.parseUserDateTime(from);
         LocalDateTime toDateTime = DateTimeUtil.parseUserDateTime(to);
         if (fromDateTime.isAfter(toDateTime)) {
-            throw new KrakenException("The /from date/time must not be after /to. "
-                    + "Usage: event <description> /from <start> /to <end>");
+            throw new KrakenException("The /from date/time must not be after /to. " + EVENT_USAGE);
         }
 
         return new EventCommand(description, fromDateTime, toDateTime);
