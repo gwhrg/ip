@@ -22,7 +22,7 @@ import kraken.util.DateTimeUtil;
  */
 public class Parser {
     private static final String UNKNOWN_COMMAND_MESSAGE = "I don't understand that command. "
-            + "Try: todo, deadline, event, list, find, on, mark, unmark, delete, bye";
+            + "Try: todo (t), list (l), find (f), deadline, event, on, mark, unmark, delete, bye";
     private static final String DEADLINE_USAGE = "Usage: deadline <description> /by <date>";
     private static final String EVENT_USAGE = "Usage: event <description> /from <start> /to <end>";
 
@@ -65,10 +65,13 @@ public class Parser {
         switch (commandWord) {
         case "bye":
             return new ExitCommand();
+        case "l":
         case "list":
             return new ListCommand();
+        case "f":
         case "find":
             return parseFind(args);
+        case "t":
         case "todo":
             return parseTodo(args);
         case "deadline":
