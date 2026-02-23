@@ -23,6 +23,10 @@ public class Event extends Task {
         super(description);
         this.from = from;
         this.to = to;
+        assert this.from != null : "Event start date/time must not be null";
+        assert this.to != null : "Event end date/time must not be null";
+        assert this.from == null || this.to == null || !this.from.isAfter(this.to)
+                : "Event start date/time must not be after end date/time";
     }
 
     /**
@@ -31,6 +35,10 @@ public class Event extends Task {
      * @return start date/time
      */
     public LocalDateTime getFrom() {
+        assert from != null : "Event start date/time invariant violated";
+        assert to != null : "Event end date/time invariant violated";
+        assert from == null || to == null || !from.isAfter(to)
+                : "Event range invariant violated: start must not be after end";
         return from;
     }
 
@@ -40,6 +48,10 @@ public class Event extends Task {
      * @return end date/time
      */
     public LocalDateTime getTo() {
+        assert from != null : "Event start date/time invariant violated";
+        assert to != null : "Event end date/time invariant violated";
+        assert from == null || to == null || !from.isAfter(to)
+                : "Event range invariant violated: start must not be after end";
         return to;
     }
 

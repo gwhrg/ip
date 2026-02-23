@@ -46,6 +46,8 @@ public class TaskList {
      * @return the task at {@code index}
      */
     public Task get(int index) {
+        assert index >= 0 && index < tasks.size()
+                : "Task index out of bounds for get: " + index;
         return tasks.get(index);
     }
 
@@ -70,6 +72,7 @@ public class TaskList {
      * @param task task to add
      */
     public void add(Task task) {
+        assert task != null : "Task to add must not be null";
         tasks.add(task);
     }
 
@@ -80,6 +83,8 @@ public class TaskList {
      * @return the removed task
      */
     public Task remove(int index) {
+        assert index >= 0 && index < tasks.size()
+                : "Task index out of bounds for remove: " + index;
         return tasks.remove(index);
     }
 
@@ -92,6 +97,8 @@ public class TaskList {
      */
     public Task removeTaskOrThrow(int index) throws KrakenException {
         getTaskOrThrow(index);
+        assert index >= 0 && index < tasks.size()
+                : "Validated task index out of bounds for remove: " + index;
         return tasks.remove(index);
     }
 
